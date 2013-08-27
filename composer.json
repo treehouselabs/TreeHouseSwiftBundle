@@ -26,6 +26,6 @@
         "monolog/monolog": "For logging request information",
     },
     "autoload": {
-        "psr-0": { "FM\\GetGeo": "src/" }
+        "psr-0": { "FM\\SwiftBundle": "src/" }
     }
 }
