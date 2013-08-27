@@ -1,0 +1,11 @@
+services:
+    fm_swift.store_factory:
+        class: FM\SwiftBundle\ObjectStore\Factory
+        arguments: [@filesystem, %fm_swift.root_dir%]
+
+    fm_swift.listener.service:
+        class: FM\SwiftBundle\EventListener\ServiceListener
+        arguments: [@fm_keystone.service_manager]
+        scope: request
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller }

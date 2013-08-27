@@ -1,0 +1,31 @@
+{
+    "name": "fm/swift-bundle",
+    "type": "symfony-bundle",
+    "description": "Implementation of the OpenStack Swift protocol. Can be used for an object-store.",
+    "keywords": ["swift", "openstack", "keystone", "object-store", "cdn"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Peter Kruithof",
+            "email": "peter@financial-media.nl"
+        },
+        {
+            "name": "Jeroen Fiege",
+            "email": "jeroen@financial-media.nl"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "psr/log": "1.0.*",
+        "guzzle/guzzle": "~3.7",
+        "fm/cache": "dev-master",
+        "fm/geo-utils": "dev-master",
+        "fm/keystone-client": "dev-master"
+    },
+    "suggest": {
+        "monolog/monolog": "For logging request information",
+    },
+    "autoload": {
+        "psr-0": { "FM\\GetGeo": "src/" }
+    }
+}
