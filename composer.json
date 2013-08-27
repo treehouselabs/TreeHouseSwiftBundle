@@ -23,7 +23,7 @@
         "fm/keystone-client": "dev-master"
     },
     "suggest": {
-        "monolog/monolog": "For logging request information",
+        "monolog/monolog": "For logging request information"
     },
     "autoload": {
         "psr-0": { "FM\\SwiftBundle": "src/" }
