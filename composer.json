@@ -18,8 +18,8 @@
         "php": ">=5.3.3",
         "psr/log": "1.0.*",
         "guzzle/guzzle": "~3.7",
-        "fm/cache": "dev-master",
-        "fm/geo-utils": "dev-master",
+        "fm/cache": "~0.1",
+        "fm/geo-utils": "~1.0",
         "fm/keystone-client": "dev-master"
     },
     "suggest": {
