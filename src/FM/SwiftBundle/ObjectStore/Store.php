@@ -89,9 +89,9 @@ class Store
     /**
      * Returns a file instance for an object.
      *
-     * @param  string  $container
-     * @param  string  $object
-     * @param  bool    $absolute
+     * @param  string $container
+     * @param  string $object
+     * @param  bool   $absolute
      * @return File
      */
     public function getFile($container, $object, $absolute = true)

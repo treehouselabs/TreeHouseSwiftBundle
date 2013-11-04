@@ -54,12 +54,11 @@ class ContainerController extends Controller
         $dir = $this->getContainerPath($container);
 
         if (is_dir($dir)) {
-
             $query = $request->query;
 
-            $prefix = $query->has('prefix') ? urldecode($query->get('prefix')) : null;
+            $prefix    = $query->has('prefix') ? urldecode($query->get('prefix')) : null;
             $delimiter = $query->has('delimiter') ? urldecode($query->get('delimiter')) : null;
-            $marker = $query->has('marker') ? urldecode($query->get('marker')) : null;
+            $marker    = $query->has('marker') ? urldecode($query->get('marker')) : null;
             $endMarker = $query->has('end_marker') ? urldecode($query->get('end_marker')) : null;
 
             $files = new Finder();
@@ -98,14 +97,11 @@ class ContainerController extends Controller
             }
 
             foreach ($files as $file) {
-
                 $count++;
                 $bytes += $file->getSize();
-
                 $basename = urldecode($file->getBasename());
 
                 if ($delimiter) {
-
                     $baseparts = array();
 
                     // explode on delimiter
@@ -115,7 +111,6 @@ class ContainerController extends Controller
                     $baseparts[] = array_shift($parts);
 
                     if ($lookahead) {
-
                         // we want the part after the delimiter, but there are no more parts
                         if (empty($parts)) {
                             continue;

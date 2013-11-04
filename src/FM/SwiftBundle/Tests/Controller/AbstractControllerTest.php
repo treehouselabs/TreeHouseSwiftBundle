@@ -63,10 +63,10 @@ abstract class AbstractControllerTest extends WebTestCase
     /**
      * @param $method
      * @param $uri
-     * @param array $parameters
-     * @param array $files
-     * @param array $server
-     * @param null $content
+     * @param  array    $parameters
+     * @param  array    $files
+     * @param  array    $server
+     * @param  null     $content
      * @return Response
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null)
