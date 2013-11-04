@@ -1,6 +1,6 @@
 <?php
 
-namespace FM\SwiftBundle\Event;
+namespace FM\SwiftBundle;
 
 final class SwiftEvents
 {
