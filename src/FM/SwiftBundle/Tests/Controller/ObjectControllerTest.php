@@ -248,7 +248,7 @@ class ObjectControllerTest extends AbstractControllerTest
         $this->createObject();
 
         $container = static::$kernel->getContainer();
-        $store = $c->get('fm_swift.store_factory')->getStore($this->service);
+        $store = $c->get('fm_swift.object_store.factory')->getObjectStore($this->service);
         $metadata = new Metadata;
 
         $object = $store->getObjectPath($this->containerName, $this->objectName1);

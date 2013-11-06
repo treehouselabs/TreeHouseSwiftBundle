@@ -3,15 +3,28 @@
 namespace FM\SwiftBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FM\KeystoneBundle\Entity\Service;
 use FM\SwiftBundle\Keystone\ServiceAware;
 use FM\SwiftBundle\ObjectStore\Store;
+use FM\SwiftBundle\Metadata\Metadata;
 
-class Controller extends BaseController implements ServiceAware
+abstract class Controller extends BaseController implements ServiceAware
 {
+    /**
+     * @var Service
+     */
     protected $service;
 
+    /**
+     * @return string
+     */
+    abstract public function getMetaPrefix();
+
+    /**
+     * @param Service $service
+     */
     public function setService(Service $service)
     {
         $this->service = $service;
@@ -32,11 +45,6 @@ class Controller extends BaseController implements ServiceAware
         return $this->service;
     }
 
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
     public function getDefaultResponse($code, $reason = null)
     {
         return new Response(is_null($reason) ? Response::$statusTexts[$code] : $reason, $code);
@@ -47,41 +55,24 @@ class Controller extends BaseController implements ServiceAware
      */
     public function getStore()
     {
-        return $this->get('fm_swift.store_factory')->getStore($this->getService());
+        return $this->get('fm_swift.object_store.factory')->getObjectStore($this->getService());
     }
 
-    public function getStoreRoot()
+    /**
+     * @param  Request  $request
+     * @return Metadata
+     */
+    protected function getMetadataFromRequest(Request $request)
     {
-        return $this->getStore()->getRoot();
-    }
+        $metadata = new Metadata();
 
-    public function getContainerPath($container, $absolute = true)
-    {
-        return $this->getStore()->getContainerPath($container, $absolute);
-    }
+        $regex = '/^' . preg_quote($this->getMetaPrefix()) . '(.*)$/i';
+        foreach ($request->headers->all() as $name => $values) {
+            if (preg_match($regex, $name, $matches)) {
+                $metadata->set($matches[1], is_array($values) ? $values[0] : $values);
+            }
+        }
 
-    public function getObjectPath($container, $object, $absolute = true)
-    {
-        return $this->getStore()->getObjectPath($container, $object, $absolute);
-    }
-
-    public function getFile($container, $object)
-    {
-        return $this->getStore()->getFile($container, $object);
-    }
-
-    public function getMetadata($object)
-    {
-        return $this->getStore()->getMetadata($object);
-    }
-
-    public function setMetadata($object, array $metadata)
-    {
-        return $this->getStore()->setMetadata($object, $metadata);
-    }
-
-    protected function dispatchEvent($type, $event)
-    {
-        $this->get('event_dispatcher')->dispatch($type, $event);
+        return $metadata;
     }
 }

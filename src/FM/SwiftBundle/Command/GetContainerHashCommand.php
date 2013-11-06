@@ -21,11 +21,11 @@ class GetContainerHashCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $factory = $this->getContainer()->get('fm_swift.store_factory');
+        $factory = $this->getContainer()->get('fm_swift.object_store.factory');
         $service = $this->getContainer()->get('fm_keystone.service_manager')->findServiceById($input->getArgument('service'));
         $container = $input->getArgument('container');
 
-        $path = $factory->getStore($service)->getContainerPath($container);
+        $path = $factory->getObjectStore($service)->getContainerPath($container);
 
         $output->writeln(sprintf('Container <info>%s</info> is hashed into <info>%s</info>', $container, $path));
     }

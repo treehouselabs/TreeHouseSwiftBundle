@@ -1,11 +1,29 @@
 services:
-    fm_swift.store_factory:
-        class: FM\SwiftBundle\ObjectStore\Factory
-        arguments: [@filesystem, %fm_swift.root_dir%]
+  fm_swift.object_store.factory:
+    class: FM\SwiftBundle\ObjectStore\ObjectStoreFactory
+    arguments:
+      - @fm_swift.object_store.driver_factory # object store driver factory, configured in extension
+      - @fm_swift.metadata.driver_factory     # metadata driver factory, configured in extension
 
-    fm_swift.listener.service:
-        class: FM\SwiftBundle\EventListener\ServiceListener
-        arguments: [@fm_keystone.service_manager]
-        scope: request
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller }
+  fm_swift.object_store.driver_factory.filesystem:
+    class: FM\SwiftBundle\ObjectStore\Driver\FilesystemDriverFactory
+    arguments:
+      - @filesystem
+      - %fm_swift.root_dir%
+
+  fm_swift.metadata.driver_factory.file:
+    class: FM\SwiftBundle\Metadata\Driver\FileDriverFactory
+    arguments:
+      - %fm_swift.root_dir%
+
+  fm_swift.metadata.driver_factory.xattr:
+    class: FM\SwiftBundle\Metadata\Driver\XattrDriverFactory
+    arguments:
+      - @fm_swift.object_store.driver_factory
+
+  fm_swift.listener.service:
+    class: FM\SwiftBundle\EventListener\ServiceListener
+    arguments: [@fm_keystone.service_manager]
+    scope: request
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller }

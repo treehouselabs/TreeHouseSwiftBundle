@@ -2,25 +2,38 @@
 
 namespace FM\SwiftBundle\Tests\Controller;
 
-use FM\SwiftBundle\ObjectStore\Metadata;
+use FM\SwiftBundle\Metadata\Metadata;
 
 class ContainerControllerTest extends AbstractControllerTest
 {
     protected $containerName = 'test';
 
-    public function getContainerRoute()
+    public function setUp()
     {
-        return $this->getRoute('get_container', array('container' => $this->containerName));
+        parent::setUp();
+
+        $this->deleteContainer();
+    }
+
+    public function getContainerRoute($method = 'get')
+    {
+        return static::getRoute(sprintf('%s_container', strtolower($method)), array('container' => $this->containerName));
     }
 
     public function createContainer()
     {
-        $this->request('PUT', $this->getContainerRoute());
+        $this->request('PUT', $this->getContainerRoute('put'));
     }
 
     public function deleteContainer()
     {
-        $this->request('DELETE', $this->getContainerRoute());
+        $this->request('DELETE', $this->getContainerRoute('delete'));
+    }
+
+    public function assertMethodResponseCode($method, $code)
+    {
+        $response = $this->request(strtoupper($method), $this->getContainerRoute($method));
+        $this->assertEquals($code, $response->getStatusCode());
     }
 
     public function testNoAuth()
@@ -31,38 +44,34 @@ class ContainerControllerTest extends AbstractControllerTest
         $this->assertEquals(500, $client->getResponse()->getStatusCode());
     }
 
-    public function testContainerNotFound()
-    {
-        $this->deleteContainer();
-
-        $this->assertEquals(404, $this->request('GET', $this->getContainerRoute())->getStatusCode());
-        $this->assertEquals(404, $this->request('POST', $this->getContainerRoute())->getStatusCode());
-        $this->assertEquals(404, $this->request('HEAD', $this->getContainerRoute())->getStatusCode());
-        $this->assertEquals(404, $this->request('DELETE', $this->getContainerRoute())->getStatusCode());
-    }
-
     public function testPutContainer()
     {
-        $this->deleteContainer();
+        // no container: 201
+        $this->assertMethodResponseCode('put', 201);
 
-        $response = $this->request('PUT', $this->getContainerRoute());
-        $this->assertEquals(201, $response->getStatusCode());
-
-        $response = $this->request('PUT', $this->getContainerRoute());
-        $this->assertEquals(202, $response->getStatusCode());
+        // existing container: 202
+        $this->assertMethodResponseCode('put', 202);
     }
 
     public function testHeadContainer()
     {
+        // no container: 404
+        $this->assertMethodResponseCode('head', 404);
+
+        // create container
         $this->createContainer();
 
-        $response = $this->request('HEAD', $this->getContainerRoute());
+        // valid response now
+        $response = $this->request('HEAD', $this->getContainerRoute('head'));
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEquals(0, $response->headers->get('Content-Length'));
     }
 
     public function testPostContainer()
     {
+        // no container: 404
+        $this->assertMethodResponseCode('head', 404);
+
         $this->createContainer();
 
         $response = $this->request('POST', $this->getContainerRoute());
@@ -71,6 +80,9 @@ class ContainerControllerTest extends AbstractControllerTest
 
     public function testGetContainer()
     {
+        // no container: 404
+        $this->assertMethodResponseCode('head', 404);
+
         $this->createContainer();
 
         $response = $this->request('GET', $this->getContainerRoute());
@@ -79,6 +91,9 @@ class ContainerControllerTest extends AbstractControllerTest
 
     public function testGetObjects()
     {
+        // no container: 404
+        $this->assertMethodResponseCode('head', 404);
+
         $this->createContainer();
 
         $sizes = array(
@@ -96,7 +111,7 @@ class ContainerControllerTest extends AbstractControllerTest
         );
 
         foreach ($sizes as $size) {
-            $objectRoute = $this->getRoute('get_object', array('container' => $this->containerName, 'object' => $size));
+            $objectRoute = static::getRoute('get_object', array('container' => $this->containerName, 'object' => $size));
             $this->request('PUT', $objectRoute, array(), array(), array('HTTP_Content-Type' => 'text/plain', 'HTTP_Content-Length' => strlen($size)), $size);
         }
 
@@ -151,7 +166,7 @@ class ContainerControllerTest extends AbstractControllerTest
         $this->deleteContainer();
         $this->createContainer();
 
-        $objectRoute = $this->getRoute('get_object', array('container' => $this->containerName, 'object' => 'foo'));
+        $objectRoute = static::getRoute('get_object', array('container' => $this->containerName, 'object' => 'foo'));
         $this->request('PUT', $objectRoute, array(), array(), array('HTTP_Content-Type' => 'text/plain', 'HTTP_Content-Length' => strlen('foo')), 'foo');
 
         // get metadata
@@ -177,6 +192,9 @@ class ContainerControllerTest extends AbstractControllerTest
 
     public function testDeleteContainer()
     {
+        // no container: 404
+        $this->assertMethodResponseCode('head', 404);
+
         $this->createContainer();
 
         $response = $this->request('DELETE', $this->getContainerRoute());
@@ -192,7 +210,7 @@ class ContainerControllerTest extends AbstractControllerTest
         $this->request('POST', $this->getContainerRoute(), array(), array(), array('HTTP_X-Container-Meta-Foo' => 'Bar'));
 
         $c = static::$kernel->getContainer();
-        $store = $c->get('fm_swift.store_factory')->getStore($this->service);
+        $store = $c->get('fm_swift.object_store.factory')->getObjectStore($this->service);
         $metadata = new Metadata;
 
         $container = $store->getContainerPath($this->service, $this->containerName);

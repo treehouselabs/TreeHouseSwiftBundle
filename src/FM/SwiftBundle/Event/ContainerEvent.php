@@ -3,16 +3,26 @@
 namespace FM\SwiftBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
+use FM\SwiftBundle\ObjectStore\Container;
 
 class ContainerEvent extends Event
 {
-    private $container;
+    /**
+     * @var Container
+     */
+    protected $container;
 
-    public function __construct($container)
+    /**
+     * @param Container $container
+     */
+    public function __construct(Container $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * @return Container
+     */
     public function getContainer()
     {
         return $this->container;

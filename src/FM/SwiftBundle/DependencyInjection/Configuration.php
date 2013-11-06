@@ -25,6 +25,24 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('root_dir')
                     ->defaultValue('%kernel.root_dir%/var/data')
                 ->end()
+                ->arrayNode('store')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('driver')
+                            ->defaultValue('filesystem')
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('metadata')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('driver')
+                            ->defaultValue(function() {
+                                return (extension_loaded('xattr') && xattr_supported(__FILE__)) ? 'xattr' : 'file';
+                            })
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
