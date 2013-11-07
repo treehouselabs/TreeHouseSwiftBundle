@@ -4,9 +4,12 @@ namespace FM\SwiftBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use FM\SwiftBundle\ObjectStore\DriverFactoryInterface as StoreDriverFactoryInterface;
+use FM\SwiftBundle\Metadata\DriverFactoryInterface as MetadataDriverFactoryInterface;
 
 class FMSwiftExtension extends Extension
 {
@@ -20,8 +23,7 @@ class FMSwiftExtension extends Extension
 
         $this->setParameters($container, $config);
 
-        $this->setStoreDriver($container, $config);
-        $this->setMetadataDriver($container, $config);
+        $this->loadObjectStores($container, $config);
     }
 
     protected function setParameters(ContainerBuilder $container, array $config)
@@ -29,32 +31,70 @@ class FMSwiftExtension extends Extension
         $container->setParameter('fm_swift.root_dir', $config['root_dir']);
     }
 
-    protected function setStoreDriver(ContainerBuilder $container, array $config)
+    protected function loadObjectStores(ContainerBuilder $container, array $config)
     {
-        if (!$container->hasDefinition('fm_swift.object_store.factory')) {
-            return;
-        }
+        $registry = $container->getDefinition('fm_swift.object_store.registry');
 
-        $driverFactory = sprintf('fm_swift.object_store.driver_factory.%s', $config['store']['driver']);
-        $container->setAlias('fm_swift.object_store.driver_factory', $driverFactory);
+        foreach ($config['stores'] as $name => $storeConfig) {
+            if ($storeConfig['metadata'] === 'xattr') {
+                // check if xattr is supported
+                if (!$this->hasXattrSupport()) {
+                    throw new \LogicException('Xattr is not supported on this filesystem. You can install it by installing "libattr1" and "libattr1-dev" packages on the server, and the xattr pecl module.');
+                }
+
+                // xattr is only allowed when store driver is filesystem
+                // (because we need to set the attributes in the files)
+                if ($storeConfig['driver'] !== 'filesystem') {
+                    throw new \LogicException('The xattr metadata driver can only be used in conjunction with the filesystem store driver');
+                }
+            }
+
+            $storeId = sprintf('fm_swift.object_store.%s', $name);
+            $storeDriverId = sprintf('%s.store_driver', $storeId);
+            $metadataDriverId = sprintf('%s.metadata_driver', $storeId);
+
+            $service = new Reference($storeConfig['service']);
+
+            // create drivers
+            $this->createStoreDriver($container, $service, $storeDriverId, $storeConfig['driver'], $config);
+            $this->createMetadataDriver($container, $service, $metadataDriverId, $storeConfig['metadata'], $config);
+
+            $store = $container->setDefinition($storeId, new DefinitionDecorator('fm_swift.object_store'));
+            $store->replaceArgument(0, new Reference($storeDriverId));
+            $store->replaceArgument(1, new Reference($metadataDriverId));
+
+            $registry->addMethodCall('addObjectStore', array($service, new Reference($storeId)));
+        }
     }
 
-    protected function setMetadataDriver(ContainerBuilder $container, array $config)
+    protected function createStoreDriver(ContainerBuilder $container, Reference $service, $id, $type, array $config)
     {
-        if (!$container->hasDefinition('fm_swift.object_store.factory')) {
+        $serviceId = sprintf('fm_swift.object_store.driver.%s', $type);
+        if ($container->hasDefinition($serviceId)) {
+            // create based on abstract service
+            $driver = $container->setDefinition($id, new DefinitionDecorator($serviceId));
+            $driver->replaceArgument(0, $service);
+
             return;
         }
 
-        $metadata = $config['metadata'];
-        $type = $metadata['driver'];
+        // it must be a service then
+        $container->setAlias($id, $type);
+    }
 
-        // check if xattr is supported
-        if (($type === 'xattr') && !$this->hasXattrSupport()) {
-            throw new \LogicException('Xattr is not supported on this filesystem. You can install it by installing "libattr1" and "libattr1-dev" packages on the server, and the xattr pecl module.');
+    protected function createMetadataDriver(ContainerBuilder $container, Reference $service, $id, $type, array $config)
+    {
+        $serviceId = sprintf('fm_swift.metadata.driver.%s', $type);
+        if ($container->hasDefinition($serviceId)) {
+            // create based on abstract service
+            $driver = $container->setDefinition($id, new DefinitionDecorator($serviceId));
+            $driver->replaceArgument(0, $service);
+
+            return;
         }
 
-        $driverFactory = sprintf('fm_swift.metadata.driver_factory.%s', $type);
-        $container->setAlias('fm_swift.metadata.driver_factory', $driverFactory);
+        // it must be a service then
+        $container->setAlias($id, $type);
     }
 
     protected function hasXattrSupport()

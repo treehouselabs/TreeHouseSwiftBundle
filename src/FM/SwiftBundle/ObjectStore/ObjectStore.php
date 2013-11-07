@@ -11,6 +11,7 @@ use FM\SwiftBundle\Exception\DuplicateException;
 use FM\SwiftBundle\Exception\NotFoundException;
 use FM\SwiftBundle\ObjectStore\DriverInterface as StoreDriverInterface;
 use FM\SwiftBundle\Metadata\DriverInterface as MetadataDriverInterface;
+use FM\SwiftBundle\Metadata\Metadata;
 
 /**
  * Main class to handle containers and objects.
@@ -204,14 +205,13 @@ class ObjectStore
     }
 
     /**
-     * @param  string $container
-     * @param  string $object
-     * @param  string $destination
-     * @param  string $name
-     * @param  string $overwrite
-     * @return string
+     * @param  Object    $source
+     * @param  Container $destination
+     * @param  string    $name
+     * @param  Metadata  $metadata    Extra metadata
+     * @return Object
      */
-    public function copyObject(Object $source, Container $destination, $name, $overwrite = true)
+    public function copyObject(Object $source, Container $destination, $name, Metadata $metadata = null)
     {
         if (!$this->storeDriver->objectExists($source)) {
             throw new NotFoundException(sprintf('Object "%s" does not exist', $source->getPath()));
@@ -219,8 +219,10 @@ class ObjectStore
 
         $object = $this->storeDriver->copyObject($source, $destination, $name, $overwrite);
 
-        $meta = $this->metadataDriver->get($source->getPath());
-        $this->metadataDriver->set($object->getPath(), $meta);
+        // set metadata
+        $sourceMetadata = $this->metadataDriver->get($source->getPath());
+        $sourceMetadata->add($metadata->all());
+        $this->metadataDriver->set($object->getPath(), $sourceMetadata);
 
         $this->dispatchEvent(SwiftEvents::COPY_OBJECT, new ObjectEvent($object));
 

@@ -25,7 +25,7 @@ class ContainerController extends Controller
      */
     public function headAction(Request $request, $container)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         if (null === $container = $store->getContainer($container)) {
             return $this->getDefaultResponse(404);
@@ -49,7 +49,7 @@ class ContainerController extends Controller
      */
     public function getAction(Request $request, $container)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         if (null === $container = $store->getContainer($container)) {
             return $this->getDefaultResponse(404);
@@ -81,7 +81,7 @@ class ContainerController extends Controller
      */
     public function putAction(Request $request, $container)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         try {
             $store->createContainer(new Container($container));
@@ -99,7 +99,7 @@ class ContainerController extends Controller
      */
     public function postAction(Request $request, $container)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         if (null === $container = $store->getContainer($container)) {
             return $this->getDefaultResponse(404);
@@ -121,7 +121,7 @@ class ContainerController extends Controller
      */
     public function deleteAction(Request $request, $container)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         try {
             $store->removeContainer(new Container($container));

@@ -31,6 +31,6 @@ class FilesystemDriverFactory implements DriverFactoryInterface
 
     public function getDriver(Service $service)
     {
-        return new FilesystemDriver($this->filesystem, sprintf('%s/%s', $this->storeRoot, $service->getId()));
+        return new FilesystemDriver($this->filesystem, sprintf('%s/%s', $this->storeRoot, $service->getName()));
     }
 }

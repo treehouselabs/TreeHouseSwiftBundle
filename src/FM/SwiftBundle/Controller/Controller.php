@@ -5,17 +5,15 @@ namespace FM\SwiftBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FM\KeystoneBundle\Entity\Service;
-use FM\SwiftBundle\Keystone\ServiceAware;
-use FM\SwiftBundle\ObjectStore\Store;
+use FM\SwiftBundle\ObjectStore\ObjectStore;
 use FM\SwiftBundle\Metadata\Metadata;
 
-abstract class Controller extends BaseController implements ServiceAware
+abstract class Controller extends BaseController
 {
     /**
-     * @var Service
+     * @var ObjectStore
      */
-    protected $service;
+    protected $objectStore;
 
     /**
      * @return string
@@ -23,39 +21,31 @@ abstract class Controller extends BaseController implements ServiceAware
     abstract public function getMetaPrefix();
 
     /**
-     * @param Service $service
+     * @param ObjectStore $objectStore
      */
-    public function setService(Service $service)
+    public function setObjectStore(ObjectStore $objectStore)
     {
-        $this->service = $service;
+        $this->objectStore = $objectStore;
     }
 
     /**
-     * @return Service
+     * @return ObjectStore
      * @throws \LogicException
      */
-    public function getService()
+    public function getObjectStore()
     {
-        if ($this->service === null) {
+        if ($this->objectStore === null) {
             throw new \LogicException(
                 'No service set on the controller. This is likely due to a mismatch in the request url and the service public-url'
             );
         }
 
-        return $this->service;
+        return $this->objectStore;
     }
 
     public function getDefaultResponse($code, $reason = null)
     {
         return new Response(is_null($reason) ? Response::$statusTexts[$code] : $reason, $code);
-    }
-
-    /**
-     * @return Store
-     */
-    public function getStore()
-    {
-        return $this->get('fm_swift.object_store.factory')->getObjectStore($this->getService());
     }
 
     /**

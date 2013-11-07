@@ -27,7 +27,7 @@ class ObjectController extends Controller
      */
     public function headAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         if (null === $object = $store->getObject($container, $object)) {
             return $this->getDefaultResponse(404);
@@ -56,7 +56,7 @@ class ObjectController extends Controller
      */
     public function getAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         if (null === $object = $store->getObject($container, $object)) {
             return $this->getDefaultResponse(404);
@@ -82,7 +82,7 @@ class ObjectController extends Controller
      */
     public function putAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         // get the container first, this must exist
         $containerName = $container;
@@ -136,7 +136,7 @@ class ObjectController extends Controller
      */
     public function postAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         // try to get existing object
         if (null === $object = $store->getObject($container, $object)) {
@@ -158,7 +158,7 @@ class ObjectController extends Controller
      */
     public function deleteAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         // try to get existing object
         if (null === $object = $store->getObject($container, $object)) {
@@ -177,7 +177,7 @@ class ObjectController extends Controller
      */
     public function copyAction(Request $request, $container, $object)
     {
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         // check for destination header
         if (!$request->headers->has('Destination')) {
@@ -203,11 +203,8 @@ class ObjectController extends Controller
             return $this->getDefaultResponse(411, sprintf('Container "%s" does not exist', $destContainer));
         }
 
-        // overwrite metadata if it's specified
+        // add metadata if it's specified
         $metadata = $this->getMetadataFromRequest($request);
-        if (!$metadata->isEmpty()) {
-            $object->setMetadata($metadata);
-        }
 
         $copy = $store->copyObject($source, $container, $name, true);
 
@@ -224,7 +221,7 @@ class ObjectController extends Controller
             return $request->getContent();
         }
 
-        $store = $this->getStore();
+        $store = $this->getObjectStore();
 
         // check for valid path value
         $path = $request->headers->get('X-Copy-From');

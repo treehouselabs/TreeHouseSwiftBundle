@@ -17,6 +17,6 @@ class FileDriverFactory implements DriverFactoryInterface
 
     public function getDriver(Service $service)
     {
-        return new FileDriver(sprintf('%s/%s', $this->root, $service->getId()));
+        return new FileDriver(sprintf('%s/%s', $this->root, $service->getName()));
     }
 }
