@@ -18,7 +18,7 @@
         "php": ">=5.4",
         "symfony/symfony": "~2.2",
         "jms/di-extra-bundle": "1.4.*",
-        "fm/keystone-bundle": "~0.3"
+        "fm/keystone-bundle": "~0.4"
     },
     "autoload": {
         "psr-0": { "FM\\SwiftBundle": "src/" }
