@@ -225,17 +225,16 @@ class FilesystemDriver implements DriverInterface
      * @param  string $object
      * @param  string $destination
      * @param  string $name
-     * @param  string $overwrite
      * @return string
      */
-    public function copyObject(Object $source, Container $destinationContainer, $name, $overwrite = true)
+    public function copyObject(Object $source, Container $destinationContainer, $name)
     {
         $sourcePath = $this->getObjectPath($source);
         $destinationObject = new Object($destinationContainer, $name);
         $destinationPath = $this->getObjectPath($destinationObject);
 
         // copy file including metadata
-        $this->filesystem->copy($sourcePath, $destinationPath, $overwrite);
+        $this->filesystem->copy($sourcePath, $destinationPath, true);
         $destinationObject->getMetadata()->add($source->getMetadata()->all());
 
         return $destinationObject;

@@ -13,6 +13,6 @@ interface DriverInterface
     public function removeContainer(Container $container);
     public function objectExists(Object $object);
     public function updateObject(Object $object, $content);
-    public function copyObject(Object $source, Container $destinationContainer, $name, $overwrite = true);
+    public function copyObject(Object $source, Container $destinationContainer, $name);
     public function removeObject(Object $object);
 }

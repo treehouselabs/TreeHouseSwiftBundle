@@ -58,6 +58,15 @@ class Object
     }
 
     /**
+     * @param  string $suffix
+     * @return string
+     */
+    public function getBasename($suffix = null)
+    {
+        return basename($this->name, $suffix);
+    }
+
+    /**
      * @return string
      */
     public function getPath()
