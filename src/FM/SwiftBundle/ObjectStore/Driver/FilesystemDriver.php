@@ -95,11 +95,11 @@ class FilesystemDriver implements DriverInterface
      * @param  string        $delimiter
      * @param  string        $marker
      * @param  string        $endMarker
-     * @return ContainerList
+     * @return string[]
      */
     public function listContainer(Container $container, $prefix = null, $delimiter = null, $marker = null, $endMarker = null, $limit = 10000)
     {
-        $list = new ObjectList();
+        $list = array();
 
         $files = new Finder();
         $files->in($this->getContainerPath($container));
@@ -158,14 +158,14 @@ class FilesystemDriver implements DriverInterface
 
                 $basename = implode($delimiter, $baseparts);
 
-                if ($list->hasObject($basename)) {
+                if (in_array($basename, $list)) {
                     continue;
                 }
             }
 
-            $list->addObject($basename, $file->getSize());
+            $list[] = $basename;
 
-            if ($list->count() >= $limit) {
+            if (sizeof($list) >= $limit) {
                 break;
             }
         }

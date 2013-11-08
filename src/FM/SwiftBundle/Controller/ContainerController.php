@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FM\SwiftBundle\Exception\DuplicateException;
 use FM\SwiftBundle\Exception\NotFoundException;
 use FM\SwiftBundle\ObjectStore\Container;
+use FM\SwiftBundle\ObjectStore\Object;
 
 class ContainerController extends Controller
 {
@@ -63,13 +64,14 @@ class ContainerController extends Controller
         $endMarker = $query->has('end_marker') ? urldecode($query->get('end_marker')) : null;
         $limit     = $query->getInt('limit', 10000);
 
-        $list = $store->listContainer($container, $prefix, $delimiter, $marker, $endMarker, $limit);
+        $objects = $store->listContainer($container, $prefix, $delimiter, $marker, $endMarker, $limit);
+        $list = implode("\n", array_map(function(Object $object) {
+            return $object->getName();
+        }, $objects));
 
         $response = $this->getDefaultResponse(200);
         $response->headers->set('X-Container-Read', '.r:*');
-        $response->headers->set('X-Container-Object-Count', $list->count());
-        $response->headers->set('X-Container-Bytes-Used', $list->getSize());
-        $response->setContent(implode("\n", $list->getObjects()));
+        $response->setContent($list);
 
         return $response;
     }

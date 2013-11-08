@@ -137,7 +137,7 @@ class ObjectStore
      * @param  string        $delimiter
      * @param  string        $marker
      * @param  string        $endMarker
-     * @return ContainerList
+     * @return Object[]
      */
     public function listContainer(Container $container, $prefix = null, $delimiter = null, $marker = null, $endMarker = null, $limit = 10000)
     {
@@ -145,7 +145,16 @@ class ObjectStore
             throw new NotFoundException(sprintf('Container "%s" does not exist', $container->getPath()));
         }
 
-        return $this->storeDriver->listContainer($container, $prefix, $delimiter, $marker, $endMarker, $limit);
+        // search for the files
+        $list = $this->storeDriver->listContainer($container, $prefix, $delimiter, $marker, $endMarker, $limit);
+
+        // create objects for all files
+        return array_map(function($name) use ($container) {
+            $object = new Object($container, $name);
+            $object->setMetadata($this->metadataDriver->get($object->getPath()));
+
+            return $object;
+        }, $list);
     }
 
     /**
@@ -217,11 +226,13 @@ class ObjectStore
             throw new NotFoundException(sprintf('Object "%s" does not exist', $source->getPath()));
         }
 
-        $object = $this->storeDriver->copyObject($source, $destination, $name, $overwrite);
+        $object = $this->storeDriver->copyObject($source, $destination, $name);
 
         // set metadata
         $sourceMetadata = $this->metadataDriver->get($source->getPath());
-        $sourceMetadata->add($metadata->all());
+        if ($metadata) {
+            $sourceMetadata->add($metadata->all());
+        }
         $this->metadataDriver->set($object->getPath(), $sourceMetadata);
 
         $this->dispatchEvent(SwiftEvents::COPY_OBJECT, new ObjectEvent($object));
