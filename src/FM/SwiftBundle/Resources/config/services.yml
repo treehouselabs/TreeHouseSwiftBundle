@@ -40,6 +40,9 @@ services:
     abstract: true
     class: FM\SwiftBundle\Metadata\Driver\XattrDriver
     factory_service: fm_swift.metadata.driver_factory.xattr
+    factory_method: getDriver
+    arguments:
+      - null # service
 
   fm_swift.metadata.driver_factory.xattr:
     class: FM\SwiftBundle\Metadata\Driver\XattrDriverFactory
