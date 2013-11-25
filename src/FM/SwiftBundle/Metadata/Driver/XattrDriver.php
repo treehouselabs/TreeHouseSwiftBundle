@@ -47,7 +47,7 @@ class XattrDriver implements DriverInterface
 
         // set new metadata
         foreach ($metadata as $name => $value) {
-            xattr_set($object, $name, $value);
+            xattr_set($file, $name, $value);
         }
 
         return true;
