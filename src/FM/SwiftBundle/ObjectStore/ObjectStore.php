@@ -4,6 +4,7 @@ namespace FM\SwiftBundle\ObjectStore;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use FM\SwiftBundle\SwiftEvents;
 use FM\SwiftBundle\Event\ContainerEvent;
 use FM\SwiftBundle\Event\ObjectEvent;
@@ -29,7 +30,7 @@ class ObjectStore
     protected $metadataDriver;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -47,7 +48,7 @@ class ObjectStore
     }
 
     /**
-     * @return EventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getEventDispatcher()
     {
