@@ -2,21 +2,31 @@
 
 namespace FM\SwiftBundle\ObjectStore\Driver;
 
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\File;
 use FM\SwiftBundle\Exception\IntegrityException;
 use FM\SwiftBundle\Exception\SwiftException;
-use FM\SwiftBundle\ObjectStore\DriverInterface;
 use FM\SwiftBundle\ObjectStore\Container;
+use FM\SwiftBundle\ObjectStore\DriverInterface;
 use FM\SwiftBundle\ObjectStore\Object;
-use FM\SwiftBundle\ObjectStore\ObjectList;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\File;
 
 class FilesystemDriver implements DriverInterface
 {
+    /**
+     * @var string
+     */
     protected $storeRoot;
+
+    /**
+     * @var Filesystem
+     */
     protected $filesystem;
 
+    /**
+     * @param Filesystem $filesystem
+     * @param string     $storeRoot
+     */
     public function __construct(Filesystem $filesystem, $storeRoot)
     {
         $this->filesystem = $filesystem;
@@ -28,9 +38,10 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * Returns path.
+     * Returns full path.
      *
-     * @param  string $path
+     * @param string $path
+     *
      * @return string
      */
     public function getPath($path)
@@ -39,10 +50,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * Returns the path to a container.
-     *
-     * @param  Container $container
-     * @return string
+     * @inheritdoc
      */
     public function getContainerPath(Container $container)
     {
@@ -50,10 +58,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * Returns the path to an object.
-     *
-     * @param  Object $object
-     * @return string
+     * @inheritdoc
      */
     public function getObjectPath(Object $object)
     {
@@ -61,11 +66,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * Returns a file instance for an object.
-     *
-     * @param  string $container
-     * @param  string $object
-     * @return File
+     * @inheritdoc
      */
     public function getObjectFile(Object $object)
     {
@@ -73,8 +74,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  string  $container
-     * @return boolean
+     * @inheritdoc
      */
     public function containerExists(Container $container)
     {
@@ -82,7 +82,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param string $container
+     * @inheritdoc
      */
     public function createContainer(Container $container)
     {
@@ -90,12 +90,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  string        $container
-     * @param  string        $prefix
-     * @param  string        $delimiter
-     * @param  string        $marker
-     * @param  string        $endMarker
-     * @return string[]
+     * @inheritdoc
      */
     public function listContainer(Container $container, $prefix = null, $delimiter = null, $marker = null, $endMarker = null, $limit = 10000)
     {
@@ -129,6 +124,7 @@ class FilesystemDriver implements DriverInterface
             $lookahead = true;
         }
 
+        /** @var File $file */
         foreach ($files as $file) {
             $basename = urldecode($file->getBasename());
             if ($delimiter) {
@@ -174,7 +170,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param string $container
+     * @inheritdoc
      */
     public function removeContainer(Container $container)
     {
@@ -182,9 +178,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  string  $container
-     * @param  string  $object
-     * @return boolean
+     * @inheritdoc
      */
     public function objectExists(Object $object)
     {
@@ -192,9 +186,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param string $container
-     * @param string $object
-     * @param string $content
+     * @inheritdoc
      */
     public function updateObject(Object $object, $content, $checksum = null)
     {
@@ -205,7 +197,6 @@ class FilesystemDriver implements DriverInterface
             $this->filesystem->dumpFile($filename, $content);
         } else {
             // write with end-to-end integrity
-            $dir = dirname($filename);
             $tmpFile = tempnam(sys_get_temp_dir(), basename($filename));
 
             if (false === @file_put_contents($tmpFile, $content)) {
@@ -221,11 +212,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  string $container
-     * @param  string $object
-     * @param  string $destination
-     * @param  string $name
-     * @return string
+     * @inheritdoc
      */
     public function copyObject(Object $source, Container $destinationContainer, $name)
     {
@@ -241,8 +228,7 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param string $container
-     * @param string $object
+     * @inheritdoc
      */
     public function removeObject(Object $object)
     {
@@ -250,8 +236,15 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  Object $object
-     * @return string
+     * @inheritdoc
+     */
+    public function touchObject(Object $object)
+    {
+        touch($this->getObjectPath($object));
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getObjectChecksum(Object $object)
     {
@@ -259,7 +252,8 @@ class FilesystemDriver implements DriverInterface
     }
 
     /**
-     * @param  string $path
+     * @param string $path
+     *
      * @return string
      */
     protected function getChecksum($path)
@@ -270,7 +264,9 @@ class FilesystemDriver implements DriverInterface
     /**
      * Removes a container or object.
      *
-     * @param string $file
+     * @throws \InvalidArgumentException When $path is outside the store root
+     *
+     * @param string $path
      */
     protected function remove($path)
     {

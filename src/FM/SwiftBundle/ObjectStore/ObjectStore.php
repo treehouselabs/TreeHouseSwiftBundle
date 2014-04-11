@@ -2,17 +2,18 @@
 
 namespace FM\SwiftBundle\ObjectStore;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use FM\SwiftBundle\SwiftEvents;
 use FM\SwiftBundle\Event\ContainerEvent;
 use FM\SwiftBundle\Event\ObjectEvent;
 use FM\SwiftBundle\Exception\DuplicateException;
 use FM\SwiftBundle\Exception\NotFoundException;
-use FM\SwiftBundle\ObjectStore\DriverInterface as StoreDriverInterface;
 use FM\SwiftBundle\Metadata\DriverInterface as MetadataDriverInterface;
 use FM\SwiftBundle\Metadata\Metadata;
+use FM\SwiftBundle\ObjectStore\DriverInterface as StoreDriverInterface;
+use FM\SwiftBundle\SwiftEvents;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * Main class to handle containers and objects.
@@ -72,7 +73,10 @@ class ObjectStore
     }
 
     /**
-     * @param  string  $container
+     * @param string|Container $container
+     *
+     * @throws \InvalidArgumentException When $container is neither a string nor a Container instance
+     *
      * @return boolean
      */
     public function containerExists($container)
@@ -89,7 +93,9 @@ class ObjectStore
     }
 
     /**
-     * @param string $container
+     * @param Container $container
+     *
+     * @throws DuplicateException When container already exists
      */
     public function createContainer(Container $container)
     {
@@ -105,6 +111,8 @@ class ObjectStore
 
     /**
      * @param Container $container
+     *
+     * @throws NotFoundException When container does not exist
      */
     public function updateContainer(Container $container)
     {
@@ -118,7 +126,9 @@ class ObjectStore
     }
 
     /**
-     * @param string $container
+     * @param Container $container
+     *
+     * @throws NotFoundException When container does not exist
      */
     public function removeContainer(Container $container)
     {
@@ -133,12 +143,16 @@ class ObjectStore
     }
 
     /**
-     * @param  string        $container
-     * @param  string        $prefix
-     * @param  string        $delimiter
-     * @param  string        $marker
-     * @param  string        $endMarker
-     * @return Object[]
+     * @param Container $container
+     * @param string    $prefix
+     * @param string    $delimiter
+     * @param integer   $marker
+     * @param integer   $endMarker
+     * @param integer   $limit
+     *
+     * @throws NotFoundException When container does not exist
+     *
+     * @return \FM\SwiftBundle\ObjectStore\Object[]
      */
     public function listContainer(Container $container, $prefix = null, $delimiter = null, $marker = null, $endMarker = null, $limit = 10000)
     {
@@ -159,8 +173,11 @@ class ObjectStore
     }
 
     /**
-     * @param  string  $container
-     * @param  string  $object
+     * @param string|Container $container
+     * @param string           $name
+     *
+     * @throws \InvalidArgumentException When $container is neither a string nor a Container instance
+     *
      * @return boolean
      */
     public function objectExists($container, $name)
@@ -177,9 +194,10 @@ class ObjectStore
     }
 
     /**
-     * @param string $container
-     * @param string $object
-     * @param string $content
+     * @param string|Container $container
+     * @param string $name
+     *
+     * @return \FM\SwiftBundle\ObjectStore\Object|null
      */
     public function getObject($container, $name)
     {
@@ -198,9 +216,9 @@ class ObjectStore
     }
 
     /**
-     * @param string $container
-     * @param string $object
-     * @param string $content
+     * @param \FM\SwiftBundle\ObjectStore\Object $object
+     * @param string                             $content
+     * @param string                             $checksum
      */
     public function updateObject(Object $object, $content = null, $checksum = null)
     {
@@ -215,11 +233,14 @@ class ObjectStore
     }
 
     /**
-     * @param  Object    $source
-     * @param  Container $destination
-     * @param  string    $name
-     * @param  Metadata  $metadata    Extra metadata
-     * @return Object
+     * @param \FM\SwiftBundle\ObjectStore\Object $source
+     * @param  Container                         $destination
+     * @param  string                            $name
+     * @param  Metadata                          $metadata    Extra metadata
+     *
+     * @throws NotFoundException
+     *
+     * @return \FM\SwiftBundle\ObjectStore\Object
      */
     public function copyObject(Object $source, Container $destination, $name, Metadata $metadata = null)
     {
@@ -242,8 +263,9 @@ class ObjectStore
     }
 
     /**
-     * @param string $container
-     * @param string $object
+     * @param \FM\SwiftBundle\ObjectStore\Object $object
+     *
+     * @throws NotFoundException
      */
     public function removeObject(Object $object)
     {
@@ -258,7 +280,22 @@ class ObjectStore
     }
 
     /**
-     * @param  Object $object
+     * @param \FM\SwiftBundle\ObjectStore\Object $object
+     *
+     * @throws NotFoundException
+     */
+    public function touchObject(Object $object)
+    {
+        if (!$this->storeDriver->objectExists($object)) {
+            throw new NotFoundException(sprintf('Object "%s" does not exist', $object->getPath()));
+        }
+
+        $this->storeDriver->touchObject($object);
+    }
+
+    /**
+     * @param \FM\SwiftBundle\ObjectStore\Object $object
+     *
      * @return string
      */
     public function getObjectChecksum(Object $object)
@@ -267,8 +304,9 @@ class ObjectStore
     }
 
     /**
-     * @param  Object $object
-     * @return \Symfony\Component\HttpFoundation\File\File
+     * @param \FM\SwiftBundle\ObjectStore\Object $object
+     *
+     * @return File
      */
     public function getObjectFile(Object $object)
     {
@@ -276,8 +314,8 @@ class ObjectStore
     }
 
     /**
-     * @param  string $name
-     * @param  Event  $event
+     * @param string $name
+     * @param Event  $event
      */
     protected function dispatchEvent($name, Event $event)
     {
