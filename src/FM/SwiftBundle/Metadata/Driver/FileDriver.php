@@ -7,16 +7,21 @@ use FM\SwiftBundle\Metadata\Metadata;
 
 class FileDriver implements DriverInterface
 {
+    /**
+     * @var string
+     */
     protected $root;
 
+    /**
+     * @param string $root
+     */
     public function __construct($root)
     {
         $this->root = $root;
     }
 
     /**
-     * @param  string $path
-     * @return array
+     * @inheritdoc
      */
     public function get($path)
     {
@@ -30,21 +35,17 @@ class FileDriver implements DriverInterface
     }
 
     /**
-     * @param  string  $path
-     * @param  array   $metadata
-     * @return boolean
+     * @inheritdoc
      */
     public function set($path, Metadata $metadata)
     {
         $metaFile = $this->getMetaFile($path);
 
-        return file_put_contents($metaFile, json_encode($metadata->all()));
+        return false !== file_put_contents($metaFile, json_encode($metadata->all()));
     }
 
     /**
-     * @param  string  $path
-     * @param  array   $metadata
-     * @return boolean
+     * @inheritdoc
      */
     public function add($path, Metadata $metadata)
     {
@@ -55,8 +56,7 @@ class FileDriver implements DriverInterface
     }
 
     /**
-     * @param  string  $path
-     * @return boolean
+     * @inheritdoc
      */
     public function remove($path)
     {
@@ -70,9 +70,9 @@ class FileDriver implements DriverInterface
     }
 
     /**
-     * @param  string                    $file
+     * @param string $path
+     *
      * @return string
-     * @throws \InvalidArgumentException
      */
     protected function getMetaFile($path)
     {

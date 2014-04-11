@@ -5,27 +5,31 @@ namespace FM\SwiftBundle\Metadata;
 interface DriverInterface
 {
     /**
-     * @param  Container $container
-     * @return array
+     * @param string $path
+     *
+     * @return Metadata
      */
     public function get($path);
 
     /**
-     * @param  Container $container
-     * @param  array     $metadata
+     * @param string   $path
+     * @param Metadata $metadata
+     *
      * @return boolean
      */
     public function set($path, Metadata $metadata);
 
     /**
-     * @param  Container $container
-     * @param  array     $metadata
+     * @param string   $path
+     * @param Metadata $metadata
+     *
      * @return boolean
      */
     public function add($path, Metadata $metadata);
 
     /**
-     * @param  Container $container
+     * @param string $path
+     *
      * @return boolean
      */
     public function remove($path);
