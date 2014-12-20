@@ -1,4 +1,4 @@
-FMSwiftBundle
-=============
+DEPRECATED
+==========
 
-Implementation of the OpenStack Swift protocol. Can be used for an object-store.
+This bundle is superseded by https://github.com/treehouselabs/TreeHouseSwiftBundle

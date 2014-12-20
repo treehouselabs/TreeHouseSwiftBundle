@@ -1,7 +1,7 @@
 {
     "name": "fm/swift-bundle",
     "type": "symfony-bundle",
-    "description": "Implementation of the OpenStack Swift protocol. Can be used for an object-store.",
+    "description": "This bundle is superseded by https://packagist.org/packages/treehouselabs/swift-bundle",
     "keywords": ["swift", "openstack", "keystone", "object-store", "cdn"],
     "license": "MIT",
     "authors": [
@@ -19,6 +19,9 @@
         "symfony/symfony": "~2.2",
         "jms/di-extra-bundle": "1.4.*",
         "fm/keystone-bundle": "~0.3"
+    },
+    "suggest": {
+        "treehouselabs/swift-bundle": "For the maintained counterpart of this bundle"
     },
     "autoload": {
         "psr-0": { "FM\\SwiftBundle": "src/" }
