@@ -1,0 +1,23 @@
+security:
+  encoders:
+    TreeHouse\KeystoneIntegrationBundle\Entity\User: sha256
+
+  role_hierarchy:
+    ROLE_CDN_USER: ROLE_USER
+
+  providers:
+    main:
+      entity: { class: TreeHouseKeystoneIntegrationBundle:User, property: username }
+
+  firewalls:
+    tokens:
+      pattern:       ^/tokens
+      stateless:     true
+      keystone-user: ~
+
+    cdn:
+      pattern:   ^/
+      provider:  main
+      stateless: true
+      simple_preauth:
+        authenticator: tree_house.keystone.token_authenticator

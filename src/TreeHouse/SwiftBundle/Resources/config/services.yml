@@ -1,0 +1,92 @@
+parameters:
+  tree_house.swift.command.container_hash.class: TreeHouse\SwiftBundle\Command\GetContainerHashCommand
+  tree_house.swift.listener.authorization.class: TreeHouse\SwiftBundle\EventListener\AuthorizationListener
+  tree_house.swift.object_store.registry.class: TreeHouse\SwiftBundle\ObjectStore\ObjectStoreRegistry
+  tree_house.swift.object_store.class: TreeHouse\SwiftBundle\ObjectStore\ObjectStore
+  tree_house.swift.object_store.driver.filesystem.class: TreeHouse\SwiftBundle\ObjectStore\Driver\FilesystemDriver
+  tree_house.swift.object_store.driver_factory.filesystem.class: TreeHouse\SwiftBundle\ObjectStore\Driver\FilesystemDriverFactory
+  tree_house.swift.metadata.driver.file.class: TreeHouse\SwiftBundle\Metadata\Driver\FileDriver
+  tree_house.swift.metadata.driver_factory.file.class: TreeHouse\SwiftBundle\Metadata\Driver\FileDriverFactory
+  tree_house.swift.metadata.driver.xattr.class: TreeHouse\SwiftBundle\Metadata\Driver\XattrDriver
+  tree_house.swift.metadata.driver_factory.xattr.class: TreeHouse\SwiftBundle\Metadata\Driver\XattrDriverFactory
+
+services:
+  tree_house.swift.object_store.registry:
+    class: %tree_house.swift.object_store.registry.class%
+
+  tree_house.swift.object_store:
+    abstract: true
+    class: %tree_house.swift.object_store.class%
+    arguments:
+      - null # store driver
+      - null # metadata driver
+
+  tree_house.swift.object_store.driver.filesystem:
+    abstract: true
+    class: %tree_house.swift.object_store.driver.filesystem.class%
+    factory_service: tree_house.swift.object_store.driver_factory.filesystem
+    factory_method: getDriver
+    arguments:
+      - null # service
+
+  tree_house.swift.object_store.driver_factory.filesystem:
+    class: %tree_house.swift.object_store.driver_factory.filesystem.class%
+    arguments:
+      - @filesystem
+      - %tree_house.swift.root_dir%
+
+  tree_house.swift.metadata.driver.file:
+    abstract: true
+    class: %tree_house.swift.metadata.driver.file.class%
+    factory_service: tree_house.swift.metadata.driver_factory.file
+    factory_method: getDriver
+    arguments:
+      - null # service
+
+  tree_house.swift.metadata.driver_factory.file:
+    class: %tree_house.swift.metadata.driver_factory.file.class%
+    arguments:
+      - %tree_house.swift.root_dir%
+
+  tree_house.swift.metadata.driver.xattr:
+    abstract: true
+    class: %tree_house.swift.metadata.driver.xattr.class%
+    factory_service: tree_house.swift.metadata.driver_factory.xattr
+    factory_method: getDriver
+    arguments:
+      - null # service
+
+  tree_house.swift.metadata.driver_factory.xattr:
+    class: %tree_house.swift.metadata.driver_factory.xattr.class%
+    arguments:
+      - @tree_house.swift.object_store.driver_factory.filesystem
+
+  tree_house.swift.controller.abstract:
+    abstract: true
+    class: TreeHouse\SwiftBundle\Controller\AbstractController
+    arguments:
+      - @tree_house.swift.object_store.registry
+      - @tree_house.keystone.service_manager
+
+  tree_house.swift.controller.container:
+    parent: tree_house.swift.controller.abstract
+    class: TreeHouse\SwiftBundle\Controller\ContainerController
+
+  tree_house.swift.controller.object:
+    parent: tree_house.swift.controller.abstract
+    class: TreeHouse\SwiftBundle\Controller\ObjectController
+
+  tree_house.swift.command.container_hash:
+    class: %tree_house.swift.command.container_hash.class%
+    arguments:
+      - @tree_house.keystone.service_manager
+      - @tree_house.swift.object_store.registry
+    tags:
+      - { name: console.command }
+
+  tree_house.swift.listener.authorization:
+    class: %tree_house.swift.listener.authorization.class%
+    arguments:
+      - @security.authorization_checker
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

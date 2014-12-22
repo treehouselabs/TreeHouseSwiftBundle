@@ -1,0 +1,5 @@
+composer.lock
+/tests/Functional/app/cache
+/tests/Functional/app/logs
+/tests/Functional/app/var
+vendor/

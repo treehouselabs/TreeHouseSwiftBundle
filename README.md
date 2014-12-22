@@ -1,4 +1,1 @@
-DEPRECATED
-==========
-
-This bundle is superseded by https://github.com/treehouselabs/TreeHouseSwiftBundle
+Implementation of the OpenStack Swift protocol. Can be used for an object-store.

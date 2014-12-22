@@ -1,0 +1,5 @@
+keystone:
+  resource: @TreeHouseKeystoneBundle/Resources/config/routing.yml
+
+swift:
+  resource: @TreeHouseSwiftBundle/Resources/config/routing.yml

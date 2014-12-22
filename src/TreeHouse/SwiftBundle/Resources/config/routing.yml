@@ -1,0 +1,86 @@
+head_container:
+  pattern: /{container}
+  methods: [HEAD]
+  defaults:
+    _controller: tree_house.swift.controller.container:headAction
+    _expression: ROLE_USER
+
+get_container:
+  pattern: /{container}
+  methods: [GET]
+  defaults:
+    _controller: tree_house.swift.controller.container:getAction
+    _expression: ROLE_USER
+
+put_container:
+  pattern: /{container}
+  methods: [PUT]
+  defaults:
+    _controller: tree_house.swift.controller.container:putAction
+    _expression: ROLE_USER
+
+post_container:
+  pattern: /{container}
+  methods: [POST]
+  defaults:
+    _controller: tree_house.swift.controller.container:postAction
+    _expression: ROLE_USER
+
+delete_container:
+  pattern: /{container}
+  methods: [DELETE]
+  defaults:
+    _controller: tree_house.swift.controller.container:deleteAction
+    _expression: ROLE_USER
+
+head_object:
+  pattern: /{container}/{object}
+  methods: [HEAD]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:headAction
+
+get_object:
+  pattern: /{container}/{object}
+  methods: [GET]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:getAction
+
+put_object:
+  pattern: /{container}/{object}
+  methods: [PUT]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:putAction
+    _expression: ROLE_USER
+
+post_object:
+  pattern: /{container}/{object}
+  methods: [POST]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:postAction
+    _expression: ROLE_USER
+
+copy_object:
+  pattern: /{container}/{object}
+  methods: [COPY]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:copyAction
+    _expression: ROLE_USER
+
+delete_object:
+  pattern: /{container}/{object}
+  methods: [DELETE]
+  requirements:
+    object: .*
+  defaults:
+    _controller: tree_house.swift.controller.object:deleteAction
+    _expression: ROLE_USER
