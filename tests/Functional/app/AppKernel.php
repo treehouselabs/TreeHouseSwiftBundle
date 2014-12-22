@@ -30,28 +30,4 @@ class AppKernel extends Kernel
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCacheDir()
-    {
-        if (getenv('TRAVIS')) {
-            return '/var/ramfs/cache/' .  $this->environment;
-        }
-
-        return parent::getCacheDir();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLogDir()
-    {
-        if (getenv('TRAVIS')) {
-            return '/var/ramfs/logs';
-        }
-
-        return parent::getLogDir();
-    }
 }
