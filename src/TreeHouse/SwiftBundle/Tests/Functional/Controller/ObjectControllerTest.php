@@ -64,18 +64,18 @@ class ObjectControllerTest extends AbstractControllerTest
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
     }
 
-    public function testPutObjectNoContentLengthOrContentType()
-    {
-        $this->markTestIncomplete('Kernel automatically adds content length/type headers. Find a way to bypass this');
-
-        $this->createContainer();
-
-        $response = $this->request('PUT', $this->getObjectRoute(), [], [], ['HTTP_Content-Length' => $this->fileSize]);
-        $this->assertEquals(Response::HTTP_LENGTH_REQUIRED, $response->getStatusCode());
-
-        $response = $this->request('PUT', $this->getObjectRoute(), [], [], ['HTTP_Content-Type' => 'text/plain']);
-        $this->assertEquals(Response::HTTP_LENGTH_REQUIRED, $response->getStatusCode());
-    }
+//    public function testPutObjectNoContentLengthOrContentType()
+//    {
+//        $this->markTestIncomplete('Kernel automatically adds content length/type headers. Find a way to bypass this');
+//
+//        $this->createContainer();
+//
+//        $response = $this->request('PUT', $this->getObjectRoute(), [], [], ['HTTP_Content-Length' => $this->fileSize]);
+//        $this->assertEquals(Response::HTTP_LENGTH_REQUIRED, $response->getStatusCode());
+//
+//        $response = $this->request('PUT', $this->getObjectRoute(), [], [], ['HTTP_Content-Type' => 'text/plain']);
+//        $this->assertEquals(Response::HTTP_LENGTH_REQUIRED, $response->getStatusCode());
+//    }
 
     public function testPutObjectWithIntegrity()
     {
