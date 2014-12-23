@@ -45,7 +45,7 @@ class GetContainerHashCommand extends ContainerAwareCommand
             ->setDescription('Gets the hash for a given container')
             ->addArgument('service', InputArgument::REQUIRED, 'The service name')
             ->addArgument('container', InputArgument::REQUIRED, 'The container to hash')
-            ->addOption('absolute', 'a', InputOption::VALUE_NONE, 'Return the absolute path instead of just the container', false)
+            ->addOption('absolute', 'a', InputOption::VALUE_NONE, 'Return the absolute path instead of just the container')
         ;
     }
 
