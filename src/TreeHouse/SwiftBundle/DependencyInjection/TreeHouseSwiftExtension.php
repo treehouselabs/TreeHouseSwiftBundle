@@ -34,6 +34,7 @@ class TreeHouseSwiftExtension extends Extension
     protected function setParameters(ContainerBuilder $container, array $config)
     {
         $container->setParameter('tree_house.swift.root_dir', $config['root_dir']);
+        $container->setParameter('tree_house.swift.expression', $config['expression']);
     }
 
     /**
@@ -65,8 +66,8 @@ class TreeHouseSwiftExtension extends Extension
             $service = new Reference($storeConfig['service']);
 
             // create drivers
-            $this->createStoreDriver($container, $service, $storeDriverId, $storeConfig['driver'], $config);
-            $this->createMetadataDriver($container, $service, $metadataDriverId, $storeConfig['metadata'], $config);
+            $this->createStoreDriver($container, $service, $storeDriverId, $storeConfig['driver']);
+            $this->createMetadataDriver($container, $service, $metadataDriverId, $storeConfig['metadata']);
 
             $store = $container->setDefinition($storeId, new DefinitionDecorator('tree_house.swift.object_store'));
             $store->replaceArgument(0, new Reference($storeDriverId));
@@ -81,9 +82,8 @@ class TreeHouseSwiftExtension extends Extension
      * @param Reference        $service
      * @param string           $id
      * @param string           $type
-     * @param array            $config
      */
-    protected function createStoreDriver(ContainerBuilder $container, Reference $service, $id, $type, array $config)
+    protected function createStoreDriver(ContainerBuilder $container, Reference $service, $id, $type)
     {
         $serviceId = sprintf('tree_house.swift.object_store.driver.%s', $type);
         if ($container->hasDefinition($serviceId)) {
@@ -103,9 +103,8 @@ class TreeHouseSwiftExtension extends Extension
      * @param Reference        $service
      * @param string           $id
      * @param string           $type
-     * @param array            $config
      */
-    protected function createMetadataDriver(ContainerBuilder $container, Reference $service, $id, $type, array $config)
+    protected function createMetadataDriver(ContainerBuilder $container, Reference $service, $id, $type)
     {
         $serviceId = sprintf('tree_house.swift.metadata.driver.%s', $type);
         if ($container->hasDefinition($serviceId)) {

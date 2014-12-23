@@ -5,7 +5,6 @@ namespace TreeHouse\SwiftBundle\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class AuthorizationListener
 {
@@ -38,9 +37,7 @@ class AuthorizationListener
         }
 
         if (!$this->authorizationChecker->isGranted($request->attributes->get('_expression'))) {
-            // ideally we want to throw an AccessDeniedHttpException here, but the keystone-bundle
-            // catches those and converts them into 401 statuses, whereas we want 403's here.
-            throw new AuthenticationException();
+            throw new AccessDeniedHttpException('Forbidden');
         }
     }
 }
