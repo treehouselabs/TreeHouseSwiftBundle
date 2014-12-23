@@ -3,35 +3,35 @@ head_container:
   methods: [HEAD]
   defaults:
     _controller: tree_house.swift.controller.container:headAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 get_container:
   pattern: /{container}
   methods: [GET]
   defaults:
     _controller: tree_house.swift.controller.container:getAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 put_container:
   pattern: /{container}
   methods: [PUT]
   defaults:
     _controller: tree_house.swift.controller.container:putAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 post_container:
   pattern: /{container}
   methods: [POST]
   defaults:
     _controller: tree_house.swift.controller.container:postAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 delete_container:
   pattern: /{container}
   methods: [DELETE]
   defaults:
     _controller: tree_house.swift.controller.container:deleteAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 head_object:
   pattern: /{container}/{object}
@@ -56,7 +56,7 @@ put_object:
     object: .*
   defaults:
     _controller: tree_house.swift.controller.object:putAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 post_object:
   pattern: /{container}/{object}
@@ -65,7 +65,7 @@ post_object:
     object: .*
   defaults:
     _controller: tree_house.swift.controller.object:postAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 copy_object:
   pattern: /{container}/{object}
@@ -74,7 +74,7 @@ copy_object:
     object: .*
   defaults:
     _controller: tree_house.swift.controller.object:copyAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
 
 delete_object:
   pattern: /{container}/{object}
@@ -83,4 +83,4 @@ delete_object:
     object: .*
   defaults:
     _controller: tree_house.swift.controller.object:deleteAction
-    _expression: ROLE_USER
+    _expression: %tree_house.swift.expression%
