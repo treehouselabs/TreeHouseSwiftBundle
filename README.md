@@ -9,7 +9,7 @@ Implementation of the OpenStack Swift protocol. Can be used for an object-store.
 Add dependency:
 
 ```sh
-composer require treehouselabs/swift-bundle:@dev
+composer require treehouselabs/swift-bundle:~1.0
 ```
 
 Enable bundles (the KeystoneBundle is a dependency for this bundle):
@@ -24,7 +24,7 @@ $bundles[] = new TreeHouse\SwiftBundle\TreeHouseSwiftBundle();
 If you haven't done so already, configure the KeystoneBundle. For more information check the
 [documentation][1] for that bundle. Then add the object store(s) to the Swift configuration.
 
-[1]: https://github.com/treehouselabs/TreeHouseKeystoneBundle/blob/master/src/TreeHouse/KeystoneBundle/Resources/doc/01-setup.md
+[1]: /src/TreeHouse/KeystoneBundle/Resources/doc/01-setup.md
 
 ```yaml
 # app/config/config.yml
