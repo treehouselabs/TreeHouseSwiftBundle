@@ -24,7 +24,7 @@ $bundles[] = new TreeHouse\SwiftBundle\TreeHouseSwiftBundle();
 If you haven't done so already, configure the KeystoneBundle. For more information check the
 [documentation][1] for that bundle. Then add the object store(s) to the Swift configuration.
 
-[1]: /src/TreeHouse/KeystoneBundle/Resources/doc/01-setup.md
+[1]: https://github.com/treehouselabs/TreeHouseKeystoneBundle/blob/master/src/TreeHouse/KeystoneBundle/Resources/doc/01-setup.md
 
 ```yaml
 # app/config/config.yml
