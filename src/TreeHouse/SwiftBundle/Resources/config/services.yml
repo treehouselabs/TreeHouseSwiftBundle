@@ -24,8 +24,7 @@ services:
   tree_house.swift.object_store.driver.filesystem:
     abstract: true
     class: %tree_house.swift.object_store.driver.filesystem.class%
-    factory_service: tree_house.swift.object_store.driver_factory.filesystem
-    factory_method: getDriver
+    factory: [@tree_house.swift.object_store.driver_factory.filesystem, getDriver]
     arguments:
       - null # service
 
@@ -38,8 +37,7 @@ services:
   tree_house.swift.metadata.driver.file:
     abstract: true
     class: %tree_house.swift.metadata.driver.file.class%
-    factory_service: tree_house.swift.metadata.driver_factory.file
-    factory_method: getDriver
+    factory: [@tree_house.swift.metadata.driver_factory.file, getDriver]
     arguments:
       - null # service
 
@@ -51,8 +49,7 @@ services:
   tree_house.swift.metadata.driver.xattr:
     abstract: true
     class: %tree_house.swift.metadata.driver.xattr.class%
-    factory_service: tree_house.swift.metadata.driver_factory.xattr
-    factory_method: getDriver
+    factory: [@tree_house.swift.metadata.driver_factory.xattr, getDriver]
     arguments:
       - null # service
 
